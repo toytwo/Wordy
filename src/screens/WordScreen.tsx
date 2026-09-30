@@ -1,16 +1,18 @@
 import {View, Text, Button} from 'react-native';
 import { getNewWord } from '../services/dictionaryApi';
 import React, { useState } from 'react';
+import WordDisplay from '../components/WordDisplay';
+import sampleWordData from '../storage/SampleWordData.json'
 
 function WordScreen() {
-    const [jsonResponse, setJsonResponse] = useState("Nothing");
+    const [wordData, setwordData] = useState(sampleWordData);
 
     const onPress = async () => {
         var newWord = await getNewWord();
         if (!newWord){
-            newWord = "Nothing"
+            newWord = sampleWordData;
         }
-        setJsonResponse(newWord);
+        setwordData(newWord);
     };
 
     return (
@@ -19,9 +21,9 @@ function WordScreen() {
                 onPress={onPress}
                 title="New Word"
             />
-            <Text>
-                {`${jsonResponse}`}
-            </Text>
+            <WordDisplay
+                word = {wordData}
+            />
         </View>
     );
 }
