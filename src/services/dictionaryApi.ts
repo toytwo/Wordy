@@ -5,10 +5,12 @@ interface MuseWord {
     score: number;
 }
 
-export async function getNewWord() {
+export async function getWord(word?: string) {
     const API_KEY = Config.MERRIAM_WEBSTER_DICTIONARY_API_KEY;
 
-    let word = await nextWord();
+    if(!word){
+        word = await newWord();
+    }
 
     for (let i = 0; i < 10; i++) {
         if (!word) {
@@ -60,7 +62,7 @@ async function getWordPool() {
     }
 }
 
-async function nextWord() {
+async function newWord() {
     var museJson = await getWordPool();
 
     if (!museJson) {
