@@ -1,4 +1,7 @@
 {
   "name": "Wordy",
-  "displayName": "Wordy"
+  "displayName": "Wordy",
+  "plugins": [
+    "expo-sqlite"
+  ]
 }
