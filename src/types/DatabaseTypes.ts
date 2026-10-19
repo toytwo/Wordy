@@ -26,7 +26,7 @@ export type Example = {
   example_text: string
 };
 
-export type WordType = "noun" | "adjective" | "verb" | "adverb";
+export type WordType = "noun" | "adjective" | "verb" | "adverb" | "pronoun" | "conjunction" | "interjection" | "definite article";
 
 export type Stem = {
   word_id: number
