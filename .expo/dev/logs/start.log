@@ -1,0 +1,7 @@
+{"_e":"root:init","_t":1792632070070,"format":"v0-jsonl","version":"57.0.32"}
+{"_e":"env:mode","_t":1792632070072,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1792632070077,"mode":"development","files":["../..\\..\\.env"],"env":{"MERRIAM_WEBSTER_DICTIONARY_API_KEY":"a7bc53a3-e9a3-4f88-80c4-c3bced2bfb01","MERRIAM_WEBSTER_THESAURUS_API_KEY":"07033ab5-c25b-4a05-a522-92cbd2a1e9e0"}}
+{"_e":"devserver:start","_t":1792632071233,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1792632072481,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1792632073368,"plugins":[{"packageName":"expo-sqlite","bannerTitle":"expo-sqlite","cliBanner":false,"webpageEndpoint":"/_expo/plugins/expo-sqlite"}]}
+{"_e":"metro:instantiate","_t":1792632078726,"atlas":false,"workers":8,"host":"::","port":8081}

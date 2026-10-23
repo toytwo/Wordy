@@ -2,6 +2,7 @@
   "name": "Wordy",
   "displayName": "Wordy",
   "plugins": [
-    "expo-sqlite"
+    "expo-sqlite",
+    "expo-asset"
   ]
 }

@@ -3,4 +3,7 @@ export interface Word {
   score: number;
 }
 
-export type MuseAPIResponse = { words: Word[] | null, error?: string | unknown }
+export type MuseAPIResponse = {
+  words: Word[] | null,
+  error?: string | unknown
+}

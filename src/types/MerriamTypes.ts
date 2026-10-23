@@ -92,4 +92,8 @@ export interface Supplementary {
   ldq?: unknown;
 }
 
-export type MerriamAPIResponse = { word: Word | null, error?: string | unknown, options?: string[] }
+export type MerriamAPIResponse = { 
+  word: Word | null, 
+  error?: string | unknown, 
+  options?: string[] 
+}

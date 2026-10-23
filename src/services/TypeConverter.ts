@@ -1,7 +1,10 @@
 import * as DB from "../types/DatabaseTypes";
 import * as Merriam from "../types/MerriamTypes";
 
-const DEFAULT_UNASSIGNED_VALUE = -1;
+const DEFAULT_UNASSIGNED_VALUE = 0;
+
+// TODO: 1) Change back default to -1
+//       2) Add difficulty assignment in word service
 
 function CleanText(input: string): string {
   return input
@@ -20,10 +23,17 @@ function CleanText(input: string): string {
 }
 
 function ToWordType(fl: string | undefined): DB.WordType {
+<<<<<<< HEAD
   if(fl){
     return fl.toLowerCase() as DB.WordType;
   }
   
+=======
+  if (fl) {
+    return fl.toLowerCase() as DB.WordType;
+  }
+
+>>>>>>> feature/Database
   return "noun"
 }
 
@@ -36,7 +46,11 @@ export function MerriamWordToDBWord(word: Merriam.Word): DB.Word {
     stems: MerriamStemsToDBStems(word.meta.stems, wordType),
     offensive: word.meta.offensive,
     pronunciation: word.hwi.prs?.[0]?.mw ?? "",
+<<<<<<< HEAD
     syllable_split: word.hwi.hw,
+=======
+    syllable_split: word.hwi.hw.replace(/\*/g, "·"),
+>>>>>>> feature/Database
   };
 }
 
@@ -108,12 +122,20 @@ function MerriamDefinitionsToDBDefinitions(
         const text = parsed.texts.join(" ").trim();
         if (!text) continue;
 
+<<<<<<< HEAD
         let subgroup = "";
+=======
+        let subgroup: string | null = null;
+>>>>>>> feature/Database
         if (sense.sn) {
           const match = sense.sn.match(/^(\d+)\s*(.*)$/);
           if (match) {
             currentGroup = parseInt(match[1], 10);
+<<<<<<< HEAD
             subgroup = match[2];
+=======
+            subgroup = match[2] || null;
+>>>>>>> feature/Database
           } else {
             subgroup = sense.sn;
           }
@@ -123,11 +145,19 @@ function MerriamDefinitionsToDBDefinitions(
           word_id: DEFAULT_UNASSIGNED_VALUE,
           definition_id: DEFAULT_UNASSIGNED_VALUE,
           word_type: wordType,
+<<<<<<< HEAD
           group: currentGroup,
           subgroup,
           definition_text: text,
           difficulty: 0,
           user_understanding: 0,
+=======
+          group_number: currentGroup,
+          subgroup_letter: subgroup,
+          definition_text: text,
+          difficulty: DEFAULT_UNASSIGNED_VALUE,
+          user_understanding: DEFAULT_UNASSIGNED_VALUE,
+>>>>>>> feature/Database
           examples: parsed.examples.map((example_text) => ({
             definition_id: DEFAULT_UNASSIGNED_VALUE,
             example_id: DEFAULT_UNASSIGNED_VALUE,

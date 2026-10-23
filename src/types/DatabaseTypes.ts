@@ -12,8 +12,8 @@ export type Definition = {
   word_id: number
   definition_id: number
   word_type: WordType
-  group: number
-  subgroup: string
+  group_number: number
+  subgroup_letter: string | null
   definition_text: string
   difficulty: number
   user_understanding: number
@@ -35,8 +35,8 @@ export type Stem = {
   word_type: WordType
 };
 
-export type DBAPIResponse = { 
-  success: boolean, 
-  result: Word[] | null, 
-  error?: string | unknown 
+export type DBAPIResponse = {
+  success: boolean,
+  result: Word[] | null,
+  error?: string | unknown
 }
