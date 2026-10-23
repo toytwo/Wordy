@@ -10,14 +10,14 @@ export async function StoreDBWord(word: DB.Word): Promise<DB.DBAPIResponse> {
 }
 
 export async function StoreDBWords(words: DB.Word[]): Promise<DB.DBAPIResponse> {
-  const db = await getDatabase();
-
   try {
+    const db = await getDatabase();
+
     await db.withTransactionAsync(async () => {
       for (const word of words) {
         const insertedWord = await db.runAsync(
           `INSERT INTO Words
-            (word, status, offensive, pronunciation, syllable_split)
+            (word_text, status, offensive, pronunciation, syllable_split)
            VALUES (?, 'complete', ?, ?, ?)`,
           word.word_text,
           word.offensive ? 1 : 0,
@@ -30,13 +30,13 @@ export async function StoreDBWords(words: DB.Word[]): Promise<DB.DBAPIResponse> 
         for (const definition of word.definitions) {
           const insertedDefinition = await db.runAsync(
             `INSERT INTO Definitions
-              (word_id, word_type, definition_group, definition_subgroup,
+              (word_id, word_type, group_number, subgroup_letter,
                definition_text, difficulty, user_understanding)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
             wordId,
             definition.word_type,
-            definition.group,
-            definition.subgroup,
+            definition.group_number,
+            definition.subgroup_letter,
             definition.definition_text,
             definition.difficulty,
             definition.user_understanding
@@ -56,7 +56,7 @@ export async function StoreDBWords(words: DB.Word[]): Promise<DB.DBAPIResponse> 
 
         for (const stem of word.stems) {
           await db.runAsync(
-            `INSERT INTO Stem_Words (word_id, stem_word, word_type)
+            `INSERT INTO Stem_Words (word_id, stem_text, word_type)
              VALUES (?, ?, ?)`,
             wordId,
             stem.stem_text,
@@ -67,6 +67,7 @@ export async function StoreDBWords(words: DB.Word[]): Promise<DB.DBAPIResponse> 
     });
 
     return { success: true, result: null };
+    
   } catch (error) {
     return ErrorResponse(error);
   }
@@ -87,9 +88,9 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
     const placeholders = words.map(() => "?").join(", ");
 
     const wordRows = await db.getAllAsync<DB.Word>(
-      `SELECT word_id, word, offensive, pronunciation, syllable_split
+      `SELECT *
        FROM Words
-       WHERE word IN (${placeholders})`,
+       WHERE word_text IN (${placeholders})`,
       ...words
     );
 
@@ -101,15 +102,14 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
     const wordPlaceholders = wordIds.map(() => "?").join(", ");
 
     const definitionRows = await db.getAllAsync<DB.Definition>(
-      `SELECT definition_id, word_id, word_type, definition_group,
-              definition_subgroup, definition_text, difficulty, user_understanding
+      `SELECT *
        FROM Definitions
        WHERE word_id IN (${wordPlaceholders})`,
       ...wordIds
     );
 
     const stemRows = await db.getAllAsync<DB.Stem>(
-      `SELECT word_id, stem_word, word_type
+      `SELECT *
        FROM Stem_Words
        WHERE word_id IN (${wordPlaceholders})`,
       ...wordIds
@@ -117,7 +117,7 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
 
     const definitionIds = definitionRows.map((definition) => definition.definition_id);
     const exampleRows: DB.Example[] = await db.getAllAsync<DB.Example>(
-      `SELECT definition_id, example_text
+      `SELECT *
         FROM Examples
         WHERE definition_id IN (${definitionIds.map(() => "?").join(", ")})`,
       ...definitionIds
@@ -129,11 +129,11 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
       const examples = examplesByDefinition.get(example.definition_id) ?? [];
 
       examples.push({
-        definition_id: example.definition_id, 
-        example_id: example.example_id, 
+        definition_id: example.definition_id,
+        example_id: example.example_id,
         example_text: example.example_text
       });
-      
+
       examplesByDefinition.set(example.definition_id, examples);
     }
 
@@ -145,8 +145,8 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
       definitions.push({
         word_id: definition.word_id,
         definition_id: definition.definition_id,
-        group: definition.group,
-        subgroup: definition.subgroup,
+        group_number: definition.group_number,
+        subgroup_letter: definition.subgroup_letter,
         definition_text: definition.definition_text,
         examples: examplesByDefinition.get(definition.definition_id) ?? [],
         difficulty: definition.difficulty,
@@ -161,11 +161,11 @@ export async function GetDBWords(words: string[]): Promise<DB.DBAPIResponse> {
 
     for (const stem of stemRows) {
       const stems = stemsByWord.get(stem.word_id) ?? [];
-      stems.push({ 
-        word_id: stem.word_id, 
-        stem_id: 0, 
-        stem_text: stem.stem_text, 
-        word_type: stem.word_type 
+      stems.push({
+        word_id: stem.word_id,
+        stem_id: 0,
+        stem_text: stem.stem_text,
+        word_type: stem.word_type
       });
       stemsByWord.set(stem.word_id, stems);
     }
