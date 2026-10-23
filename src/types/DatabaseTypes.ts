@@ -13,7 +13,7 @@ export type Definition = {
   definition_id: number
   word_type: WordType
   group_number: number
-  subgroup_letter: string
+  subgroup_letter: string | null
   definition_text: string
   difficulty: number
   user_understanding: number
@@ -26,7 +26,7 @@ export type Example = {
   example_text: string
 };
 
-export type WordType = "noun" | "adjective" | "verb" | "adverb";
+export type WordType = "noun" | "adjective" | "verb" | "adverb" | "pronoun" | "conjunction" | "interjection" | "definite article";
 
 export type Stem = {
   word_id: number
