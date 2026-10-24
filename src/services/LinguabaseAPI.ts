@@ -5,6 +5,8 @@ const CONFIG = "vocabulary_full";
 const SPLIT = "train";
 const BASE_URL = "https://datasets-server.huggingface.co/filter";
 
+export const MAX_WORD_FAMILIARITY = 2000000; 
+
 export async function GetWordFamiliarity(word: string): Promise<LBase.LinguabaseAPIResponse> {
   try {
     const escaped = word.replace(/'/g, "''");

@@ -4,6 +4,6 @@ export interface Word {
 }
 
 export type MuseAPIResponse = {
-  words: Word[] | null,
+  result: Word[] | number | null,
   error?: string | unknown
 }
