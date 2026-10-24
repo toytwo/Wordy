@@ -6,10 +6,11 @@ import { StoreDBWord, GetDBWord } from "./DatabaseAPI";
 import { MerriamWordToDBWord } from "./TypeConverter";
 import sampleWord from "../data/SampleWordData.json";
 import { PrintDB } from "../storage/Database";
+import { SetDBWordDifficulty } from "./WordDifficulty";
 
 export async function GetRandomWord(): Promise<DB.Word> {
-  let randomWord = await NewWord();
-  return GetWord(randomWord);
+  const random_word = await NewWord();
+  return GetWord(random_word);
 }
 
 export async function GetWord(word: string): Promise<DB.Word> {
@@ -36,6 +37,8 @@ export async function GetWord(word: string): Promise<DB.Word> {
     return MerriamWordToDBWord(sampleWord as Merriam.Word);
   }
 
+  ConstructAndStoreWordInDB(response);
+
   return response;
 }
 
@@ -44,15 +47,6 @@ async function HandleMerriamReponse(word: string): Promise<DB.Word | string[] | 
 
   if (merriam_response.word) {
     let word = MerriamWordToDBWord(merriam_response.word);
-
-    let result = await StoreDBWord(word);
-
-    if(result.error){
-      console.log("DB Error:\n"+result.error);
-    }
-    else{
-      await PrintDB();
-    }
 
     return word;
   }
@@ -82,8 +76,24 @@ async function NewWord(): Promise<string> {
     console.log(response.error);
   }
 
-  let wordList = words
+  const word_list = words
     .filter((word) => /^[A-Za-z]+$/.test(word.word)); // Removes multi-words
 
-  return wordList[Math.floor(Math.random() * wordList.length)].word;
+  return word_list[Math.floor(Math.random() * word_list.length)].word;
+}
+
+async function ConstructAndStoreWordInDB(word: DB.Word): Promise<void> {
+  // Construct
+  word = await SetDBWordDifficulty(word);
+
+  // Store
+  const store_result = await StoreDBWord(word);
+
+  if (store_result.error) {
+    console.log("DB Error:\n" + store_result.error);
+  }
+  // TODO: Delete Debug
+  else {
+    await PrintDB();
+  }
 }
