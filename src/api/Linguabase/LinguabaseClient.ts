@@ -1,17 +1,21 @@
-import * as LBase from "../types/LinguabaseTypes";
+import { WordFrequencyProvider } from "../../types/ClientTypes";
 
 const DATASET = "linguabase/linguabase";
 const CONFIG = "vocabulary_full";
 const SPLIT = "train";
-const BASE_URL = "https://datasets-server.huggingface.co/filter";
+const BASE_URL = "https://datasets-server.huggingface.co";
+const FILTER_ENDPOINT = "/filter";
+const MAX_WORD_FREQUENCY_SCORE = 2000000;
 
-export const MAX_WORD_FAMILIARITY = 2000000; 
+export class LinguabaseClient implements WordFrequencyProvider {
+  public GetMaxFrequencyScore(): number {
+    return MAX_WORD_FREQUENCY_SCORE;
+  }
 
-export async function GetWordFamiliarity(word: string): Promise<LBase.LinguabaseAPIResponse> {
-  try {
+  public async GetFrequencyScore(word: string): Promise<number> {
     const escaped = word.replace(/'/g, "''");
 
-    const url = new URL(BASE_URL);
+    const url = new URL(BASE_URL + FILTER_ENDPOINT);
     url.searchParams.set("dataset", DATASET);
     url.searchParams.set("config", CONFIG);
     url.searchParams.set("split", SPLIT);
@@ -28,8 +32,6 @@ export async function GetWordFamiliarity(word: string): Promise<LBase.Linguabase
 
     const familiarityRank = result.rows?.[0]?.row?.familiarity_rank ?? null;
 
-    return { result: familiarityRank };
-  } catch (error) {
-    return { result: null, error: error };
+    return familiarityRank
   }
 }
