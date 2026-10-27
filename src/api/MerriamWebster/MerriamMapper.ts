@@ -1,10 +1,5 @@
-import * as DB from "../types/DatabaseTypes";
-import * as Merriam from "../types/MerriamTypes";
-
-const DEFAULT_UNASSIGNED_VALUE = 0;
-
-// TODO: 1) Change back default to -1
-//       2) Add difficulty assignment in word service
+import * as DB from "../../types/DatabaseTypes";
+import * as Merriam from "./MerriamTypes";
 
 function CleanText(input: string): string {
   return input
@@ -23,41 +18,39 @@ function CleanText(input: string): string {
 }
 
 function ToWordType(fl: string | undefined): DB.WordType {
-<<<<<<< HEAD
-  if(fl){
-    return fl.toLowerCase() as DB.WordType;
-  }
-  
-=======
   if (fl) {
     return fl.toLowerCase() as DB.WordType;
   }
 
->>>>>>> feature/Database
   return "noun"
 }
 
-export function MerriamWordToDBWord(word: Merriam.Word): DB.Word {
-  const wordType = ToWordType(word.fl);
-  return {
-    word_id: DEFAULT_UNASSIGNED_VALUE,
-    definitions: MerriamDefinitionsToDBDefinitions(word.def, wordType),
-    word_text: word.hwi.hw.replace(/\*/g, ""),
-    stems: MerriamStemsToDBStems(word.meta.stems, wordType),
-    offensive: word.meta.offensive,
-    pronunciation: word.hwi.prs?.[0]?.mw ?? "",
-<<<<<<< HEAD
-    syllable_split: word.hwi.hw,
-=======
-    syllable_split: word.hwi.hw.replace(/\*/g, "·"),
->>>>>>> feature/Database
-  };
+export function MerriamWordToDBWord(result: Merriam.Word, word_text: string): DB.WordDraft {
+  const target = word_text.toLowerCase();
+
+  const filtered_result = result.filter(
+    (entry) => entry.meta.id.split(":")[0] === target // Do not convert to lower case here, sometimes merriam includes proper nouns 
+                                                      // which are always capitalized while normal entries are lower case in api results
+  );
+  let word_draft: DB.PartialWordDraft[] = Array(filtered_result.length);
+  let index = 0;
+  for (const word of filtered_result){
+    word_draft[index] = {
+      definitions: MerriamDefinitionsToDBDefinitions(word.def),
+      word_text: word.hwi.hw.replace(/\*/g, ""),
+      stems: word.meta.stems,
+      offensive: word.meta.offensive,
+      pronunciation: word.hwi.prs?.[0]?.mw ?? "",
+      syllable_split: word.hwi.hw.replace(/\*/g, "·"),
+      word_type: ToWordType(word.fl)
+    };
+    index++;
+  }
+  
+  return word_draft;
 }
 
-function ParseDefinitionText(
-  dt: Merriam.DefinitionText[] | undefined,
-  out: { texts: string[]; examples: string[] }
-): void {
+function ParseDefinitionText(dt: Merriam.DefinitionText[] | undefined, out: { texts: string[]; examples: string[] }): void {
   for (const item of dt ?? []) {
     switch (item[0]) {
       case "text": {
@@ -102,12 +95,10 @@ function FlattenSenses(items: Merriam.SenseItem[]): Partial<Merriam.Sense>[] {
   return result;
 }
 
-function MerriamDefinitionsToDBDefinitions(
-  definitions: Merriam.Definition[],
-  wordType: DB.WordType
-): DB.Definition[] {
-  const result: DB.Definition[] = [];
+function MerriamDefinitionsToDBDefinitions(definitions: Merriam.Definition[]): DB.DefinitionDraft[] {
+  const result: DB.DefinitionDraft[] = [];
   let currentGroup = 1;
+  let currentLetter: string | null = null;
 
   for (const definition of definitions ?? []) {
     for (const senseItems of definition.sseq) {
@@ -122,62 +113,32 @@ function MerriamDefinitionsToDBDefinitions(
         const text = parsed.texts.join(" ").trim();
         if (!text) continue;
 
-<<<<<<< HEAD
-        let subgroup = "";
-=======
         let subgroup: string | null = null;
->>>>>>> feature/Database
+        let subsubgroup: number | null = null;
+
         if (sense.sn) {
-          const match = sense.sn.match(/^(\d+)\s*(.*)$/);
-          if (match) {
-            currentGroup = parseInt(match[1], 10);
-<<<<<<< HEAD
-            subgroup = match[2];
-=======
-            subgroup = match[2] || null;
->>>>>>> feature/Database
-          } else {
-            subgroup = sense.sn;
+          const m = sense.sn.match(/^(?:(\d+)\s*)?(?:([a-z])\s*)?(?:\((\d+)\))?$/);
+          if (m) {
+            const [, num, letter, sub] = m;
+            if (num) {
+              currentGroup = parseInt(num, 10);
+              currentLetter = null;
+            }
+            if (letter) currentLetter = letter;
+            subgroup = currentLetter;
+            subsubgroup = sub ? parseInt(sub, 10) : null;
           }
         }
 
         result.push({
-          word_id: DEFAULT_UNASSIGNED_VALUE,
-          definition_id: DEFAULT_UNASSIGNED_VALUE,
-          word_type: wordType,
-<<<<<<< HEAD
-          group: currentGroup,
-          subgroup,
-          definition_text: text,
-          difficulty: 0,
-          user_understanding: 0,
-=======
           group_number: currentGroup,
           subgroup_letter: subgroup,
+          subsubgroup_number: subsubgroup,
           definition_text: text,
-          difficulty: DEFAULT_UNASSIGNED_VALUE,
-          user_understanding: DEFAULT_UNASSIGNED_VALUE,
->>>>>>> feature/Database
-          examples: parsed.examples.map((example_text) => ({
-            definition_id: DEFAULT_UNASSIGNED_VALUE,
-            example_id: DEFAULT_UNASSIGNED_VALUE,
-            example_text,
-          })),
+          examples: parsed.examples,
         });
       }
     }
   }
   return result;
-}
-
-function MerriamStemsToDBStems(
-  stems: string[],
-  wordType: DB.WordType
-): DB.Stem[] {
-  return stems.map((stem) => ({
-    word_id: DEFAULT_UNASSIGNED_VALUE,
-    stem_id: DEFAULT_UNASSIGNED_VALUE,
-    stem_text: stem,
-    word_type: wordType,
-  }));
 }

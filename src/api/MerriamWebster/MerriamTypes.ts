@@ -1,4 +1,4 @@
-export interface Word {
+export type Word = [{
   meta: Meta;
   hwi: Hwi;
   fl?: string;
@@ -9,9 +9,9 @@ export interface Word {
   ld_link?: Link;
   suppl?: Supplementary;
   shortdef: string[];
-}
+}];
 
-export interface Meta {
+export type Meta = {
   id: string;
   uuid: string;
   sort: string;
@@ -19,28 +19,28 @@ export interface Meta {
   section: string;
   stems: string[];
   offensive: boolean;
-}
+};
 
-export interface Hwi {
+export type Hwi = {
   hw: string;
   prs?: Pronunciation[];
-}
+};
 
-export interface Pronunciation {
+export type Pronunciation = {
   mw: string;
   sound?: Sound;
-}
+};
 
-export interface Sound {
+export type Sound = {
   audio: string;
   ref: string;
   stat: string;
-}
+};
 
-export interface Definition {
+export type Definition = {
   sseq: SenseItem[][];
   vd?: string;
-}
+};
 
 export type SenseItem =
   | ["sense", Sense]
@@ -48,7 +48,7 @@ export type SenseItem =
   | ["pseq", SenseItem[]]
   | ["sen", Partial<Sense>];
 
-export interface Sense {
+export type Sense = {
   sn?: string;
   dt: DefinitionText[];
   sls?: string[];
@@ -56,7 +56,7 @@ export interface Sense {
     sd: string;
     dt: DefinitionText[];
   };
-}
+};
 
 export type DefinitionText =
   | ["text", string]
@@ -64,36 +64,30 @@ export type DefinitionText =
   | ["snote", DefinitionText[]]
   | ["uns", DefinitionText[][]];
 
-export interface Example {
+export type Example = {
   t: string;
   aq?: unknown;
-}
+};
 
-export interface Uro {
+export type Uro = {
   ure: string;
   fl: string;
-}
+};
 
 export type EtItem =
   | ["text", string]
   | ["et_snote", EtNote[]];
 
-export interface EtNote {
+export type EtNote = {
   t: string;
-}
+};
 
-export interface Link {
+export type Link = {
   link_hw: string;
   link_fl: string;
-}
+};
 
-export interface Supplementary {
+export type Supplementary = {
   examples?: Example[];
   ldq?: unknown;
-}
-
-export type MerriamAPIResponse = { 
-  word: Word | null, 
-  error?: string | unknown, 
-  options?: string[] 
-}
+};
