@@ -1,42 +1,79 @@
-export type Word = {
+export type WordRow = {
   word_id: number
-  definitions: Definition[]
+  definitions: DefinitionRow[]
   word_text: string
-  stems: Stem[]
+  stems: StemRow[]
   offensive: boolean
   pronunciation: string
   syllable_split: string
+  word_type: WordType
 };
 
-export type Definition = {
+export type PartialWord = {
+  definitions: Definition[]
+  word_text: string
+  stems: string[]
+  offensive: boolean
+  pronunciation: string
+  syllable_split: string
+  word_type: WordType
+};
+
+export type Word = PartialWord[];
+
+export type PartialWordDraft = {
+  definitions: DefinitionDraft[]
+  word_text: string
+  stems: string[]
+  offensive: boolean
+  pronunciation: string
+  syllable_split: string
+  word_type: WordType
+};
+
+export type WordDraft = PartialWordDraft[];
+
+export type DefinitionRow = {
   word_id: number
   definition_id: number
-  word_type: WordType
   group_number: number
   subgroup_letter: string | null
+  subsubgroup_number: number | null
   definition_text: string
   difficulty: number
   user_understanding: number
-  examples: Example[]
+  examples: ExampleRow[]
 };
 
-export type Example = {
+export type Definition = {
+  group_number: number
+  subgroup_letter: string | null
+  subsubgroup_number: number | null
+  definition_text: string
+  difficulty: number
+  user_understanding: number
+  examples: string[]
+};
+
+export type DefinitionDraft = {
+  group_number: number
+  subgroup_letter: string | null
+  subsubgroup_number: number | null
+  definition_text: string
+  examples: string[]
+};
+
+export type ExampleRow = {
   definition_id: number
   example_id: number
   example_text: string
 };
 
-export type WordType = "noun" | "adjective" | "verb" | "adverb" | "pronoun" | "conjunction" | "interjection" | "definite article";
-
-export type Stem = {
-  word_id: number
+export type StemRow = {
   stem_id: number
+  word_id: number
   stem_text: string
-  word_type: WordType
 };
 
-export type DBAPIResponse = {
-  success: boolean,
-  result: Word[] | null,
-  error?: string | unknown
-}
+export const WORD_TYPES = ["noun", "adjective", "verb", "adverb", "pronoun", "conjunction", "interjection", "definite article"] as const;
+export type WordType = typeof WORD_TYPES[number];
