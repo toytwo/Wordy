@@ -1,42 +1,50 @@
+export type WordRow = Omit<PartialWord, "stems" | "definitions" | "offensive"> & Omit<Word, "partials"> & {
+  word_id: number;
+  offensive: number;
+};
+
+export type PartialWord = {
+  pronunciation: string;
+  syllable_split: string;
+  offensive: boolean;
+  word_type: WordType;
+  definitions: Definition[];
+  stems: string[];
+};
+
 export type Word = {
-  word_id: number
-  definitions: Definition[]
-  word_text: string
-  stems: Stem[]
-  offensive: boolean
-  pronunciation: string
-  syllable_split: string
+  partials: PartialWord[];
+  word_text: string;
+  difficulty: number;
+  user_understanding: number;
+};
+
+export type WordDraft = Omit<Word, "difficulty" | "user_understanding">
+
+export type DefinitionRow = Omit<Definition, "examples"> & {
+  word_id: number;
+  definition_id: number;
 };
 
 export type Definition = {
-  word_id: number
-  definition_id: number
-  word_type: WordType
-  group_number: number
-  subgroup_letter: string | null
-  definition_text: string
-  difficulty: number
-  user_understanding: number
-  examples: Example[]
+  definition_text: string;
+  group_number: number;
+  subgroup_letter: string | null;
+  subsubgroup_number: number | null;
+  examples: string[];
 };
 
-export type Example = {
-  definition_id: number
-  example_id: number
-  example_text: string
+export type ExampleRow = {
+  definition_id: number;
+  example_id: number;
+  example_text: string;
 };
 
-export type WordType = "noun" | "adjective" | "verb" | "adverb" | "pronoun" | "conjunction" | "interjection" | "definite article";
-
-export type Stem = {
-  word_id: number
-  stem_id: number
-  stem_text: string
-  word_type: WordType
+export type StemRow = {
+  stem_id: number;
+  word_id: number;
+  stem_text: string;
 };
 
-export type DBAPIResponse = {
-  success: boolean,
-  result: Word[] | null,
-  error?: string | unknown
-}
+export const WORD_TYPES = ["noun", "adjective", "verb", "adverb", "pronoun", "conjunction", "interjection", "definite article", "transitive verb", "intransitive verb"] as const;
+export type WordType = typeof WORD_TYPES[number];

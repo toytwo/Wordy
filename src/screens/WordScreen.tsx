@@ -1,24 +1,22 @@
 import { View, Text, Button, ScrollView } from 'react-native';
-import { GetRandomWord, GetWord } from '../services/WordService';
+import { wordService } from '../Composition';
 import React, { useState } from 'react';
 import WordDisplay from '../components/WordDisplay';
-import sampleWordData from '../data/SampleWordData.json'
-import { MerriamWordToDBWord } from '../services/TypeConverter';
-import * as Merriam from "../types/MerriamTypes"
+import { Word } from '../types/DatabaseTypes';
 
 const wordInjector: string[] = ["antiseptic", "bear"];
 
 function WordScreen() {
-  const [wordData, setwordData] = useState(MerriamWordToDBWord(sampleWordData as Merriam.Word));
+  const [wordData, setwordData] = useState<Word | null>(null);
 
   const onPress = async () => {
     const injectorWord = wordInjector.pop();
 
     if (injectorWord) {
-      setwordData(await GetWord(injectorWord));
+      setwordData(await wordService.GetWord(injectorWord));
     }
     else {
-      setwordData(await GetRandomWord());
+      setwordData(await wordService.GetRandomWord());
     }
   };
 
@@ -53,9 +51,16 @@ function WordScreen() {
           onPress={onPress}
           title="New Word"
         />
-        <WordDisplay
-          word={wordData}
-        />
+
+        {wordData.partials.map((partial_word, i) =>
+          <WordDisplay
+            word={partial_word}
+            word_text={wordData.word_text}
+            index={i}
+            max_index={wordData.partials.length}
+            key={i}
+          />
+        )}
       </ScrollView>
     </View>
   );
